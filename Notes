@@ -1,0 +1,62 @@
+REPLICATION CONTROLLERS
+
+-------
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: myapp-rc
+  labels:
+    name: my-app
+    type: front-end
+spec:
+  template:
+    metadata:
+      name: myapp-pod
+      labels:
+        app: myapp
+        type: front-end
+  spec:
+    containers:
+      - name: nginx-container
+        image: nginx
+
+replicas: 3     
+
+------------
+
+REPLICA SET
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: myapp-rc
+  labels:
+    name: my-app
+    type: front-end
+spec:
+  template:
+    metadata:
+      name: myapp-pod
+      labels:
+        app: myapp
+        type: front-end
+  spec:
+    containers:
+      - name: nginx-container
+        image: nginx
+
+replicas: 3     
+selector: 
+  matchLabels:
+    type: front-end
+
+-----
+
+kubectl create -f replicaset-definition.yaml 
+kubectl get replicaset
+kubectl delete replicaset myapp-replicaset ** also deletes all underlying pods
+kubectl replace -f replicaset-definition.yaml
+kubectl scale --replicas=6 -f replicaset-definition.yam;
+kubectl scale --replicas=6 replicaset myapp-replicaset
+
