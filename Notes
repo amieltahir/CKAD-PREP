@@ -60,3 +60,17 @@ kubectl replace -f replicaset-definition.yaml
 kubectl scale --replicas=6 -f replicaset-definition.yam;
 kubectl scale --replicas=6 replicaset myapp-replicaset
 
+----
+
+
+kubectl [command] [TYPE] [NAME] -o <output_format>
+
+Here are some of the commonly used formats:
+
+-o jsonOutput a JSON formatted API object.
+-o namePrint only the resource name and nothing else.
+-o wideOutput in the plain-text format with any additional information.
+-o yamlOutput a YAML formatted API object.
+
+----
+
