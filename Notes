@@ -291,4 +291,46 @@ spec:
     image: kodekloud/webapp-color
     name: webapp-color
 
-  
+----------------------------------------------
+
+SECRETS
+
+1. imperative 
+
+1.  kubectl create secret generic app-secret --from-literal=DB_HOST=mysql --from-literal=DB_USER=root --from-literal=DB_PASS=passwd
+2.  kubectl create secret generic secret-name --from-file=<path_to_file> 
+3.  kubectl create secret --from-file=app_secret.properties 
+
+2. Declarative 
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret 
+data:
+  DB_HOST: mysql
+  DB_USER: root
+  DB_PASSWORD: passwd 
+
+
+kubectl create -f secret-data.yaml  
+
+ENCODE THE PASSWORD DATA 
+echo -n 'mysql' | base64  >> enconded value
+echo -n 'root' | base64 >> encoded value
+echo -n 'passwd' | base64 >> enconded value
+
+if you want to view secret 
+
+kubectl get secrets 
+kubectl describe secrets
+kubectl get secret app-secret -o YAML >> view encoded value
+
+decode secrets
+
+echo -n "&4jd" | base64 --decode
+echo -n "JDhd" | base64 --decode
+echo -n "DKFJ" | base64 --decode
+
+
+
