@@ -351,3 +351,11 @@ spec:
     envFrom:
     - secretRef:
         name: db-secret
+
+--------------------
+
+
+https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
+
+
+
