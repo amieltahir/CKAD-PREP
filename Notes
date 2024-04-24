@@ -333,4 +333,21 @@ echo -n "JDhd" | base64 --decode
 echo -n "DKFJ" | base64 --decode
 
 
+inject secret in pod 
 
+---
+apiVersion: v1 
+kind: Pod 
+metadata:
+  labels:
+    name: webapp-pod
+  name: webapp-pod
+  namespace: default 
+spec:
+  containers:
+  - image: kodekloud/simple-webapp-mysql
+    imagePullPolicy: Always
+    name: webapp
+    envFrom:
+    - secretRef:
+        name: db-secret
