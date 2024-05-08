@@ -357,5 +357,101 @@ spec:
 
 https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
 
+---
+
+multi container pods
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: yellow
+spec:
+  containers:
+  - image: busybox
+    name: lemon
+    command:
+      - sleep
+      - "1000"
+  - image: redis
+    name: gold
+
+---
+
+Edit the pod in the elastic-stack namespace to add a sidecar container to send logs to Elastic Search. Mount the log volume to the sidecar container.
+
+Name: app
+
+Container Name: sidecar
+
+Container Image: kodekloud/filebeat-configured
+
+Volume Mount: log-volume
+
+Mount Path: /var/log/event-simulator/
+
+Existing Container Name: app
+
+Existing Container Image: kodekloud/event-simulator
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app
+  namespace: elastic-stack
+  labels:
+    name: app
+spec:
+  containers:
+  - name: app
+    image: kodekloud/event-simulator
+    volumeMounts:
+    - mountPath: /log
+      name: log-volume
+
+  - name: sidecar
+    image: kodekloud/filebeat-configured
+    volumeMounts:
+    - mountPath: /var/log/event-simulator/
+      name: log-volume
+
+  volumes:
+  - name: log-volume
+    hostPath:
+      # directory location on host
+      path: /var/log/webapp
+      # this field is optional
+      type: DirectoryOrCreate
+
+---
+
+Update the pod red to use an initContainer that uses the busybox image and sleeps for 20 seconds
+
+Pod: red
+
+initContainer Configured Correctly
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: red
+  namespace: default
+spec:
+  containers:
+  - command:
+    - sh
+    - -c
+    - echo The app is running! && sleep 3600
+    image: busybox:1.28
+    name: red-container
+  initContainers:
+  - image: busybox
+    name: red-initcontainer
+    command: 
+      - "sleep"
+      - "20"
+
 
 
