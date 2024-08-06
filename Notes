@@ -453,5 +453,55 @@ spec:
       - "sleep"
       - "20"
 
+---------------------------------------------
 
+Readiness & Liveness Probes
+
+POD Status -- pending, container_creating,running --> kubectl get pods
+
+POD Conditions --  kubectl describe pod
+
+Pod scheduled true, false
+Initialized   true, false
+ContainersReady  true, false
+Ready           true, false
+
+the pod takes a long time to be ready so readiness probe ensure its ready for service
+
+readinessProbe:
+  httpGet:
+    path: /api/ready
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 8
+
+readinessProbe:
+  tcpSocket:
+    port: 3306 
+
+readinessProbe:
+  exec:
+    command:
+      - cat
+      - /app/is_ready
+
+
+LivenessProbe:
+  httpGet:
+    path: /api/ready
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 8
+
+LivenessProbe:
+  tcpSocket:
+    port: 3306 
+
+LivenessProbe:
+  exec:
+    command:
+      - cat
+      - /app/is_ready
 
