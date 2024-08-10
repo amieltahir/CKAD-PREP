@@ -504,4 +504,27 @@ LivenessProbe:
     command:
       - cat
       - /app/is_ready
+--------------
+
+
+Rolling updates & rollbacks in deployments
+
+
+kubectl create -f deployment-definition.yml 
+kubectl get deployments
+kubectl apply -f deployment-definition.yml 
+kubectl set image deployment/my-app-deployment nginx=nginx:1.9.1
+kubectl rollout status deployment/my-app-deployment
+kubectl rollout history deployment/my-app-deployment
+kubectl rollout undo deployment/my-app-deployment 
+
+kubectl rollout history deployment nginx --revision=1
+kubectl set image deployment nginx nginx=nginx:1.17 --record
+
+controlplane $ kubectl rollout history deployment nginx
+deployment.apps/nginx 
+REVISION  CHANGE-CAUSE
+1         <none>
+2         kubectl set image deployment nginx nginx=nginx:1.17 --record=true
+
 
