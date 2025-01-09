@@ -1,1 +1,21 @@
 https://comtechies.com/linux-foundation-coupon.html
+
+KCNA exam notes :
+
+1. Service Mesh
+2. PVC policy re-claim/recyle
+3. Container restart policy
+4. container run time -> robust, simple ???
+5. kubelet function
+6. kubeproxy function
+7. kubernetes component interact with api for container run time ?
+8.GitOps vs ArgoCD & Flux
+9. Service IP in k8s
+10. Kubernetes Service definition
+11. Load balancer definition?
+12. how pod load and data
+13. cronJob in kubernetes.
+14. running batch job for 1000 compute in most cost effective way
+15. open policy agent definiton
+16. lambda function usage in cloud providers ? by number or by reserve and estimation 
+17. security context and security profile 
