@@ -1028,3 +1028,39 @@ spec:
               number: 8080
         path: /eat
         pathType: Prefix
+
+---------------
+
+ kubectl get svc -n critical-space
+NAME          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+pay-service   ClusterIP   172.20.153.254   <none>        8282/TCP   12m
+
+You are requested to make the new application available at /pay.
+
+
+Identify and implement the best approach to making this application available on the ingress controller and test to make sure its working. Look into annotations: rewrite-target as well.
+
+ kubectl create ingress ingress-pay --rule="/pay=pay-service:8082" --dry-run=client -o YAML > ingress-pay.yaml 
+
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  name: ingress-pay
+  namespace: critical-space
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: pay-service
+            port:
+              number: 8082
+        path: /pay
+        pathType: Exact
+status:
+  loadBalancer: {}
