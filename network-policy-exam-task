@@ -1,0 +1,80 @@
+https://go-cloud-native.com/kubernetes/cka-exam-task-create-network-policy#:~:text=In%20the%20Certified%20Kubernetes%20Administrator%20%28CKA%29%20exam%2C%20you,webserver%20named%20webserver-policy.%20The%20network%20policy%20should%20allow%3A
+
+Create a network policy in the namespace webserver named webserver-policy.
+
+The network policy should allow:
+
+TCP using port 80 from pods in the namespace internal-client
+TCP using port 80 from pods in the same namespace
+Assign the policy to all pods in the namespace.
+
+Furthermore, ensure that Pods in the namespace webserver can only connect to other pods in the same namespace using TCP on port 80.
+
+You can use existing Pods in the namespaces webserver, internal-client and external-client to verify your policy.
+
+---
+
+#!/bin/bash
+kubectl create ns webserver
+kubectl create ns internal-client
+kubectl create ns external-client
+kubectl run -n webserver webserver1 --image nginx
+kubectl run -n webserver webserver2 --image nginx
+kubectl run -n internal-client client1 --image busybox -- sh -c "while true; do echo Running; sleep 1; done;"
+kubectl run -n external-client client2 --image busybox -- sh -c "while true; do echo Running; sleep 1; done;"
+---
+
+controlplane $ kubectl create -f netpolicy.yaml 
+networkpolicy.networking.k8s.io/webserver-policy created
+controlplane $ cat netpolicy.yaml 
+
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: webserver-policy
+  namespace: webserver
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: internal-client
+      - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 80 
+  egress:
+    - to:
+      - podSelector: {}
+      ports: 
+        - protocol: TCP
+          port: 80
+
+----
+
+# Get IP of pods
+kubectl get pods -n webserver -o wide
+NAME         READY   STATUS    RESTARTS        AGE   IP              NODE       NOMINATED NODE   READINESS GATES
+webserver1   1/1     Running   2 (6m36s ago)   25h   10.244.120.72   minikube   <none>           <none>
+webserver2   1/1     Running   2 (6m36s ago)   25h   10.244.120.73   minikube   <none>           <none>
+kubectl get pods -n internal-client -o wide
+NAME      READY   STATUS    RESTARTS        AGE   IP              NODE       NOMINATED NODE   READINESS GATES
+client1   1/1     Running   2 (9m19s ago)   25h   10.244.120.76   minikube   <none>           <none>
+kubectl get pods -n external-client -o wide
+NAME      READY   STATUS    RESTARTS      AGE   IP              NODE       NOMINATED NODE   READINESS GATES
+client2   1/1     Running   2 (10m ago)   25h   10.244.120.71   minikube   <none>           <none>
+# Using curl/wget based on what the nginx/busybox image provide
+kubectl exec -n webserver webserver1 -- curl 10.244.120.73:80 # Port 80 from webserver1 to webserver2 should work
+kubectl exec -n webserver webserver2 -- curl 10.244.120.72:80 # Port 80 from webserver2 to webserver1 should work
+kubectl exec -n webserver webserver2 -- curl 10.244.120.72:8080 # Other ports from webserver2 to webserver1 should fail
+kubectl exec -n internal-client client1 -- wget -O- 10.244.120.72:80 # port 80 from internal-client to webserver1 should work
+kubectl exec -n internal-client client1 -- wget -O- 10.244.120.73:80 # port 80 from internal-client to webserver2 should work
+kubectl exec -n internal-client client1 -- wget -O- 10.244.120.73:8080 # other port from internal-client to webserver2 should fail
+# All requests from external-client to webserver should fail
+kubectl exec -n external-client client2 -- wget -O- 10.244.120.72:80
+kubectl exec -n external-client client2 -- wget -O- 10.244.120.73:8080
