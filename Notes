@@ -1064,3 +1064,27 @@ spec:
         pathType: Exact
 status:
   loadBalancer: {}
+
+------------------------
+
+Network Policy example
+
+Allow Ingress Traffic From API-POD on Port 3306 (db) 
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-policy
+spec:
+  matchLabels:
+    role: db
+policyTypes:
+- Ingress
+ingress:
+- from:
+  - podSelector:
+      matchLabels:
+        name: api-pod
+  ports: 
+  - protocol: TCP
+    port: 3306
