@@ -1167,3 +1167,54 @@ spec:
     requests:
       storage: 50Mi 
 
+
+---------------
+
+storage class
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: local-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 500Mi
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:alpine
+    volumeMounts:
+      - name: local-persistent-storage
+        mountPath: /var/www/html
+  volumes:
+    - name: local-persistent-storage
+      persistentVolumeClaim:
+        claimName: local-pvc
+
+
+
+Create a new Storage Class called delayed-volume-sc that makes use of the below specs:
+
+
+provisioner: kubernetes.io/no-provisioner
+
+volumeBindingMode: WaitForFirstConsumer
+
+
+
+
+
